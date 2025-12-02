@@ -1,179 +1,253 @@
-// app/components/Starfield.tsx
 'use client';
 
 import React, { useRef, useEffect } from 'react';
+import * as THREE from 'three';
 
-interface Star {
-  x: number;
-  y: number;
-  z: number;
-  baseSize: number;
-  pulseOffset: number;
-  pulseSpeed: number;
-  // 新增属性：是否有星芒
-  hasSpikes: boolean;
-}
+// ===== 可调参数区域 =====
+const STAR_COUNT = 1000;        // 星星数量：越大越密，1000–2000 比较合适
+const STAR_SIZE = 0.10;         // 星星大小：就是 vertex shader 里的 offset，0.05 更小，0.15 更大
+const STAR_SPEED = 0.02;        // 星星速度：u_time 每帧增加多少，0.01 慢，0.05 很快
+
+// 颜色：在 color1 和 color2 之间随机插值
+const COLOR_1 = 0x3068ff;       // 起始颜色（蓝）
+const COLOR_2 = 0xf34f94;       // 结束颜色（粉）
+const COLOR_3 = 0xfffff0;       // 恒星黄
 
 export default function Starfield() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvasRef.current) return;
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    // 1. 场景 & 相机
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
+    );
+    camera.position.z = 5;
 
-    // ==========================================
-    // 👇 [星芒参数]
-    // ==========================================
-    
-    const starCount = 250; 
-    const speed = 0.5;
-    const sizeMin = 2; 
-    const sizeMax = 5.5;
+    // 2. 渲染器绑定到 canvas
+    const renderer = new THREE.WebGLRenderer({
+      canvas: canvasRef.current,
+      antialias: true,
+      alpha: true, // 允许透明，方便叠加在页面内容背后
+    });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
 
-    // 星芒出现的概率 (0.15 = 15% 的星星会有星芒)
-    const spikeProbability = 0.2; 
-    
-    // 星芒的长度系数 (相对于星星本体大小的倍数)
-    // 倍数越大，十字芒越长
-    const spikeLengthScale = 3.0; 
+    // 3. 粒子几何：完全照 three.lizi.js 的思路
+    const fieldRadius = 20;   // xy 平面范围：可以理解为星空“宽度”
+    const fieldZLength = 40;  // z 方向范围：可以理解为星空“深度”
 
-    // ==========================================
+    const positions: number[] = [];
+    const corners: number[] = [];
+    const uvs: number[] = [];
+    const colorMix: number[] = [];
+    const indices: number[] = [];
 
-    let width = 0;
-    let height = 0;
-    let cx = 0;
-    let cy = 0;
-    const depth = 2200;
-    const fov = 400;
-    const stars: Star[] = [];
+    const geo = new THREE.BufferGeometry();
 
-    const resizeCanvas = () => {
-      width = window.innerWidth;
-      height = window.innerHeight;
-      canvas.width = width;
-      canvas.height = height;
-      cx = width / 2;
-      cy = height / 2;
-    };
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
+    // 星星数量由 STAR_COUNT 控制
+    for (let i = 0; i < STAR_COUNT; i++) {
+      // 随机中心坐标
+      const x = THREE.MathUtils.mapLinear(
+        Math.random(),
+        0,
+        1,
+        -fieldRadius,
+        fieldRadius
+      );
+      const y = THREE.MathUtils.mapLinear(
+        Math.random(),
+        0,
+        1,
+        -fieldRadius,
+        fieldRadius
+      );
+      const z = THREE.MathUtils.mapLinear(
+        Math.random(),
+        0,
+        1,
+        -fieldZLength / 2,
+        fieldZLength / 2
+      );
 
-    for (let i = 0; i < starCount; i++) {
-      stars.push({
-        x: (Math.random() - 0.5) * width * 2,
-        y: (Math.random() - 0.5) * height * 2,
-        z: Math.random() * depth,
-        baseSize: Math.random() * (sizeMax - sizeMin) + sizeMin,
-        pulseOffset: Math.random() * Math.PI * 2,
-        pulseSpeed: 0.01 + Math.random() * 0.03,
-        // 随机决定这颗星是否拥有星芒特质
-        hasSpikes: Math.random() < spikeProbability,
-      });
+      // colorMix 决定在 color1 / color2 之间的插值比例
+      const mixVal = Math.random();
+
+      // 一颗星用 4 个顶点，方便在 vertex shader 里扩成一个小矩形
+      for (let j = 0; j < 4; j++) {
+        positions.push(x, y, z);
+        corners.push(j);       // 0 / 1 / 2 / 3
+        colorMix.push(mixVal);
+      }
+
+      // uv：左下、右下、左上、右上
+      uvs.push(0, 1);
+      uvs.push(1, 1);
+      uvs.push(0, 0);
+      uvs.push(1, 0);
+
+      const baseIndex = 4 * i;
+      // 两个三角形拼一个矩形
+      indices.push(baseIndex, baseIndex + 1, baseIndex + 2);
+      indices.push(baseIndex + 1, baseIndex + 3, baseIndex + 2);
     }
 
-    let frameCount = 0;
-    let animationFrameId: number;
+    geo.setAttribute(
+      'position',
+      new THREE.BufferAttribute(new Float32Array(positions), 3)
+    );
+    geo.setAttribute(
+      'uv',
+      new THREE.BufferAttribute(new Float32Array(uvs), 2)
+    );
+    geo.setAttribute(
+      'corner',
+      new THREE.BufferAttribute(new Float32Array(corners), 1)
+    );
+    geo.setAttribute(
+      'colorMix',
+      new THREE.BufferAttribute(new Float32Array(colorMix), 1)
+    );
+    geo.setIndex(indices);
+    geo.computeBoundingSphere();
 
-    const render = () => {
-      frameCount++;
-      
-      ctx.fillStyle = "black"; 
-      ctx.fillRect(0, 0, width, height);
-      
-      // 使用 screen 混合模式，让光芒叠加更自然
-      ctx.globalCompositeOperation = 'screen'; 
+    // 顶点着色器：控制星星位置 / 大小 / 颜色
+    const vertexShader = `
+      attribute float corner;
+      attribute float colorMix;
+      uniform float u_time;
+      varying vec2 vUv;
+      varying vec3 vColor;
+      uniform float zMin;
+      uniform float zMax;
+      uniform vec3 color1;
+      uniform vec3 color2;
+      uniform vec3 color3;  // 新增
+      uniform float u_size; // 控制星星大小
 
-      stars.forEach((star) => {
-        star.z -= speed;
-        if (star.z <= 0) {
-          star.z = depth;
-          star.x = (Math.random() - 0.5) * width * 2;
-          star.y = (Math.random() - 0.5) * height * 2;
+      void main() {
+        vUv = uv;
+        vec3 pos = position;
+
+        // 沿 z 轴前进
+        pos.z += u_time;
+        // 超出范围后循环
+        pos.z = mod(pos.z, zMax) + zMin;
+
+        vec4 worldPos = modelMatrix * vec4(pos, 1.0);
+        vec4 viewPosition = viewMatrix * worldPos;
+
+        // offset 决定点扩成的矩形大小 -> 星星大小
+        float offset = u_size;
+
+        if (corner == 0.0) {
+          viewPosition.xy += vec2(-offset, -offset);
+        }
+        if (corner == 1.0) {
+          viewPosition.xy += vec2(offset, -offset);
+        }
+        if (corner == 2.0) {
+          viewPosition.xy += vec2(-offset, offset);
+        }
+        if (corner == 3.0) {
+          viewPosition.xy += vec2(offset, offset);
         }
 
-        const scale = fov / star.z;
-        const x2d = star.x * scale + cx;
-        const y2d = star.y * scale + cy;
-
-        if (x2d >= 0 && x2d <= width && y2d >= 0 && y2d <= height) {
-          const scaleFactor = (1 - star.z / depth);
-          const size = star.baseSize * (scaleFactor * 3); 
-          
-          // 呼吸计算
-          const breathe = 0.4 + 0.6 * (0.5 + 0.5 * Math.sin(frameCount * star.pulseSpeed + star.pulseOffset));
-          const alpha = scaleFactor * breathe;
-
-          // 1. 绘制球体 (保持之前的逻辑)
-          const gradient = ctx.createRadialGradient(x2d, y2d, 0, x2d, y2d, size);
-          gradient.addColorStop(0, `rgba(255, 255, 255, ${alpha})`);
-          gradient.addColorStop(0.2, `rgba(255, 255, 255, ${alpha * 0.8})`);
-          gradient.addColorStop(0.5, `rgba(255, 255, 255, ${alpha * 0.15})`);
-          gradient.addColorStop(1, `rgba(255, 255, 255, 0)`);
-          
-          ctx.fillStyle = gradient;
-          ctx.beginPath();
-          ctx.arc(x2d, y2d, size, 0, Math.PI * 2);
-          ctx.fill();
-
-          // 2. 绘制星芒 (Diffraction Spikes)
-          // 条件：这颗星有星芒属性 && 当前亮度足够高 (alpha > 0.5) && 距离足够近
-          if (star.hasSpikes && alpha > 0.5) {
-            // 星芒的透明度要比核心低，且随呼吸波动
-            // (alpha - 0.5) * 2 意思是：亮度超过0.5的部分才开始算星芒亮度，让它闪烁感更强
-            const spikeAlpha = (alpha - 0.5) * 0.8; 
-            const spikeLen = size * spikeLengthScale; // 星芒长度
-            const spikeWidth = size * 0.2; // 星芒极细，只有核心的 15%
-
-            // 保存画布状态，防止旋转/缩放影响其他星星
-            ctx.save();
-            ctx.translate(x2d, y2d);
-            
-            // 为了更自然，可以稍微旋转 45度，或者保持水平垂直
-            // ctx.rotate(Math.PI / 4); // 如果想变成 X 形，取消这行注释
-
-            // --- 绘制横向光束 ---
-            const gradH = ctx.createLinearGradient(-spikeLen, 0, spikeLen, 0);
-            gradH.addColorStop(0, `rgba(255, 255, 255, 0)`); // 端点透明
-            gradH.addColorStop(0.5, `rgba(255, 255, 255, ${spikeAlpha})`); // 中心最亮
-            gradH.addColorStop(1, `rgba(255, 255, 255, 0)`); // 端点透明
-            
-            ctx.fillStyle = gradH;
-            ctx.fillRect(-spikeLen, -spikeWidth / 2, spikeLen * 2, spikeWidth);
-
-            // --- 绘制纵向光束 ---
-            const gradV = ctx.createLinearGradient(0, -spikeLen, 0, spikeLen);
-            gradV.addColorStop(0, `rgba(255, 255, 255, 0)`);
-            gradV.addColorStop(0.5, `rgba(255, 255, 255, ${spikeAlpha})`);
-            gradV.addColorStop(1, `rgba(255, 255, 255, 0)`);
-            
-            ctx.fillStyle = gradV;
-            ctx.fillRect(-spikeWidth / 2, -spikeLen, spikeWidth, spikeLen * 2);
-
-            ctx.restore();
-          }
+        // 三段渐变：0–0.5 在 蓝 -> 黄，0.5–1 在 黄 -> 粉
+        if (colorMix < 0.5) {
+          float t = colorMix / 0.5;
+          vColor = mix(color1, color2, t);
+        } else {
+          float t = (colorMix - 0.5) / 0.5;
+          vColor = mix(color3, color2, t);
         }
-      });
-      
-      ctx.globalCompositeOperation = 'source-over';
-      animationFrameId = requestAnimationFrame(render);
+
+        gl_Position = projectionMatrix * viewPosition;
+      }
+    `;
+
+    // 片元着色器：用贴图控制形状和亮度
+    const fragmentShader = `
+      varying vec2 vUv;
+      varying vec3 vColor;
+      uniform sampler2D u_texture;
+
+      void main() {
+        // 灰度贴图：r 通道用来当 alpha / 高光
+        vec4 texel = texture2D(u_texture, vUv);
+
+        float alpha = texel.r;
+        vec3 color = mix(vColor, vec3(1.0), texel.r);
+
+        gl_FragColor = vec4(color, alpha);
+      }
+    `;
+
+    const textureLoader = new THREE.TextureLoader();
+
+    const material = new THREE.ShaderMaterial({
+      vertexShader,
+      fragmentShader,
+      uniforms: {
+        u_texture: {
+          value: textureLoader.load('/particle-sprite.png'),
+        },
+        color1: { value: new THREE.Color(COLOR_1) }, // 修改这里可以换主色
+        color2: { value: new THREE.Color(COLOR_2) }, // 修改这里可以换副色
+        color3: { value: new THREE.Color(COLOR_3) },
+        zMin: { value: -fieldZLength / 2 },
+        zMax: { value: fieldZLength },
+        u_time: { value: 0 },
+        u_size: { value: STAR_SIZE },               // 星星大小的统一入口
+      },
+      transparent: true,
+    });
+
+    const mesh = new THREE.Mesh(geo, material);
+    scene.add(mesh);
+
+    // 动画循环：通过 STAR_SPEED 控制速度
+    let animationId: number;
+
+    const animate = () => {
+      animationId = requestAnimationFrame(animate);
+      (material.uniforms.u_time.value as number) += STAR_SPEED;
+      renderer.render(scene, camera);
     };
 
-    render();
+    animate();
 
+    const handleResize = () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      renderer.setSize(width, height);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    // 清理
     return () => {
-      window.removeEventListener('resize', resizeCanvas);
-      cancelAnimationFrame(animationFrameId);
+      cancelAnimationFrame(animationId);
+      window.removeEventListener('resize', handleResize);
+      geo.dispose();
+      material.dispose();
+      renderer.dispose();
     };
   }, []);
 
+  // canvas 固定在最底层作为全局背景
   return (
-    <canvas 
+    <canvas
       ref={canvasRef}
-      className="fixed top-0 left-0 w-full h-full -z-10 pointer-events-none"
-      style={{ background: 'black' }}
+      className="fixed inset-0 w-full h-full -z-10 pointer-events-none"
+      style={{ backgroundColor: 'black' }}
     />
   );
 }

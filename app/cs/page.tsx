@@ -23,7 +23,7 @@ const notoSerifSC = Noto_Serif_SC({
 const SKILLS = [
   { name: "Java", src: "/Java.png" },
   { name: "Python", src: "/Python.png" },
-  { name: "C++", src: "/C++ (CPlusPlus).png" },
+  { name: "C++", src: "/Cpp.png" },
   { name: "JavaScript", src: "/JavaScript.png" },
   { name: "TypeScript", src: "/TypeScript.png" },
   { name: "MySQL", src: "/MySQL.png" },
@@ -150,7 +150,7 @@ export default function ComputerSciencePage() {
                       <h3 className="text-base font-bold text-white">Software Engineer Intern – AI Agent</h3>
                       {/* 这里使用了 flex-col 让三行信息垂直堆叠，gap-y-1 控制行间距 */}
                       <div className="flex flex-col gap-y-1 text-gray-300 text-xs mt-2 font-mono">
-                         <span>PredictX</span>
+                         <span>PredictX (Startup)</span>
                          <span>May 2025 – Sep 2025</span>
                          <span>Hong Kong</span>
                          <div className="flex flex-wrap gap-2 mt-2">
@@ -299,7 +299,7 @@ export default function ComputerSciencePage() {
                    <div>
                       <h3 className="text-base font-bold text-white">Software Engineer Intern</h3>
                       <div className="flex flex-col gap-y-1 text-gray-300 text-xs mt-2 font-mono">
-                         <span>Greenhouse Data</span>
+                         <span>Greenhouse Data (Startup)</span>
                          <span>Feb 2023 – May 2023</span>
                          <span>Hong Kong</span>
                          <div className="flex flex-wrap gap-2 mt-2">
@@ -363,7 +363,7 @@ export default function ComputerSciencePage() {
                   <div>
                      <h3 className="text-base font-bold text-white">Software Engineer Intern</h3>
                      <div className="flex flex-col gap-y-1 text-gray-300 text-xs mt-2 font-mono">
-                        <span>Siemens Mobility</span>
+                        <span>Siemens</span>
                         <span>Sep 2022 – Jan 2023</span>
                         <span>Hong Kong</span>
                         <div className="flex flex-wrap gap-2 mt-2">
@@ -606,33 +606,31 @@ export default function ComputerSciencePage() {
           </section>
         </div>
       </main>
-      {/* ================================================= */}
       {/* 👇 [独立板块] 全宽地球视频 (Full Width Earth Footer) */}
-      {/* ================================================= */}
-      <div className="relative w-full h-[50vh] min-h-[500px] overflow-hidden mt-0">
-          
-          {/* 1. 顶部融合遮罩：让地球顶部柔和地从黑色背景中浮现 */}
-          <div className="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-black via-black/80 to-transparent z-20 pointer-events-none"></div>
-          
-          {/* 2. 视频本体 */}
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover opacity-80 mix-blend-screen" 
-            style={{ objectPosition: 'center 10%' }} // 调整地球显示的垂直位置
-          >
-            <source src="/earth-loop.mp4" type="video/mp4" />
-          </video>
+      <div className="relative z-10 w-full h-[50vh] min-h-[500px] overflow-hidden mt-0">
+      {/* 1. 顶部融合遮罩 */}
+      <div className="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-black via-black/80 to-transparent z-20 pointer-events-none" />
 
-          {/* 3. 底部版权文字 (浮在地球上方) */}
-          <div className="absolute bottom-10 w-full text-center z-30 opacity-80 mix-blend-plus-lighter">
-              <p className="text-[10px] tracking-[0.3em] font-mono text-gray-300">
-                  DESIGNED & ENGINEERED BY DUAN WENBO
-              </p>
-          </div>
-          </div>
-    </div>
+      {/* 2. 视频本体：去掉 mix-blend-screen，保证完全在星空之上 */}
+      <video
+         autoPlay
+         loop
+         muted
+         playsInline
+         className="absolute inset-0 w-full h-full object-cover opacity-900"
+         style={{ objectPosition: 'center 10%' }}
+      >
+         <source src="/earth-loop.mp4" type="video/mp4" />
+      </video>
+
+      {/* 3. 底部版权文字 (浮在地球上方) */}
+      <div className="absolute bottom-10 w-full text-center z-30 opacity-80 mix-blend-plus-lighter">
+         <p className="text-[10px] tracking-[0.3em] font-mono text-gray-300">
+            DESIGNED & ENGINEERED BY DUAN WENBO
+         </p>
+      </div>
+   </div>
+   </div>
+
   );
 }
