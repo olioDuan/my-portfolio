@@ -48,10 +48,10 @@ export default function ComputerSciencePage() {
          {/* 2. 点击名字跳转回主页 (Link href="/") */}
          <Link href="/" className="inline-block group cursor-pointer">
             <div className="flex flex-col gap-y-0">
-                <h1 className={`${cinzel.className} text-3xl md:text-xl tracking-wider text-white group-hover:text-gray-300 transition-colors`}>
+                <h1 className={`${cinzel.className} md:text-2xl text-xl tracking-wider text-white group-hover:text-gray-300 transition-colors`}>
                   Duan Wenbo Alfred
                 </h1>
-                <p className={`${notoSerifSC.className} pl-4 text-2xl md:text-xl font-medium text-gray-200 tracking-[0.2em] group-hover:text-gray-400 transition-colors`}>
+                <p className={`${notoSerifSC.className} pl-10 md:text-2xl text-xl font-medium text-gray-200 tracking-[0.2em] group-hover:text-gray-400 transition-colors`}>
                   段 文博
                 </p>
             </div>
@@ -86,9 +86,9 @@ export default function ComputerSciencePage() {
               </h3>
               */}
               <ul className="flex flex-col space-y-0 border-l border-gray-800 ml-1">
-                 <li><Link href="#education" className="block pl-4 py-2 text-[12pt] text-gray-500 hover:text-[#FFFFFF] hover:border-l hover:border-[#FFFFFF] -ml-[1px] transition-all">Education</Link></li>
-                 <li><Link href="#experience" className="block pl-4 py-2 text-[12pt] text-gray-500 hover:text-[#FFFFFF] hover:border-l hover:border-[#FFFFFF] -ml-[1px] transition-all">Experience</Link></li>
-                 <li><Link href="#skills" className="block pl-4 py-2 text-[12pt] text-gray-500 hover:text-[#FFFFFF] hover:border-l hover:border-[#FFFFFF] -ml-[1px] transition-all">Skills</Link></li>
+                 <li><Link href="#education" className="block pl-4 py-2 md:text-[12pt] text-[11pt] text-gray-500 hover:text-[#FFFFFF] hover:border-l hover:border-[#FFFFFF] -ml-[1px] transition-all">Education</Link></li>
+                 <li><Link href="#experience" className="block pl-4 py-2 md:text-[12pt] text-[11pt] text-gray-500 hover:text-[#FFFFFF] hover:border-l hover:border-[#FFFFFF] -ml-[1px] transition-all">Experience</Link></li>
+                 <li><Link href="#skills" className="block pl-4 py-2 md:text-[12pt] text-[11pt] text-gray-500 hover:text-[#FFFFFF] hover:border-l hover:border-[#FFFFFF] -ml-[1px] transition-all">Skills</Link></li>
               </ul>
            </nav>
         </aside>
@@ -102,7 +102,7 @@ export default function ComputerSciencePage() {
           {/* --- Section: Education --- 
               [Source: Figma] 标题单独一行，下方内容左右分布
           */}
-          <section id="education" className="border-t border-gray-600 pt-6">
+          <section id="education" className="mt-3 md:mt-0 border-t border-gray-600 pt-6">
              {/* 标题 */}
              <h2 className="text-xs font-bold text-white  tracking-wider mb-8">Education</h2>
              
@@ -118,7 +118,7 @@ export default function ComputerSciencePage() {
                     </div>
                     {/* 右侧: 学位 */}
                     <div>
-                       <p className=" text-[16px]">Master of Science in Computer Science & Engineering</p>
+                       <p className=" text-[13px] md:text-[16px]">Master of Science in Computer Science & Engineering</p>
                     </div>
                 </div>
 
@@ -129,7 +129,7 @@ export default function ComputerSciencePage() {
                        <p className="text-gray-300 text-xs font-mono  mt-1">2020 - 2024</p>
                     </div>
                     <div>
-                       <p className=" text-[16px]">Bachelor of Science in Computer Science</p>
+                       <p className=" text-[13px] md:text-[16px]">Bachelor of Science in Computer Science</p>
                     </div>
                 </div>
              </div>
@@ -212,7 +212,7 @@ export default function ComputerSciencePage() {
                    
                    {/* 右侧：Bullet Points */}
                    <div>
-                      <ul className="list-disc pl-5 text-gray-100 text-[15px] leading-6 space-y-2 marker:text-gray-100">
+                      <ul className="list-disc pl-5 text-gray-100 md:text-[15px] text-[13px] leading-6 space-y-2 marker:text-gray-100">
                          <li>
                             Designed and shipped an AI Chat Agent for enterprise customers, owning the AI workflow and backend from prototype to production
                          </li>
@@ -277,7 +277,7 @@ export default function ComputerSciencePage() {
                       </div>
                    </div>
                    <div>
-                      <ul className="list-disc pl-5 text-gray-100 text-[15px] leading-6 space-y-2 marker:text-gray-100">
+                      <ul className="list-disc pl-5 text-gray-100 md:text-[15px] text-[13px] leading-6 space-y-2 marker:text-gray-100">
                          <li>
                             Improved live music and audio for users on weak networks by tuning a multi-threaded C++ and Swift pipeline, cutting end to end streaming delay and making playback feel smoother
                          </li>
@@ -341,7 +341,7 @@ export default function ComputerSciencePage() {
                       </div>
                    </div>
                    <div>
-                      <ul className="list-disc pl-5 text-gray-100 text-[15px] leading-6 space-y-2 marker:text-gray-100">
+                      <ul className="list-disc pl-5 text-gray-100 md:text-[15px] text-[13px] leading-6 space-y-2 marker:text-gray-100">
                          <li>
                             Built a distributed web crawler in Node.js using Express, TypeScript and RabbitMQ that could process more than thousands pages per minute, deployed on AWS EC2 with Docker Swarm and Jenkin
                          </li>
@@ -405,7 +405,7 @@ export default function ComputerSciencePage() {
                         </div>
                      </div>
                    <div>
-                      <ul className="list-disc pl-5 text-gray-100 text-[15px] leading-6 space-y-2 marker:text-gray-100">
+                      <ul className="list-disc pl-5 text-gray-100 md:text-[15px] text-[13px] leading-6 space-y-2 marker:text-gray-100">
                          <li>
                             Exposed REST APIs that let field engineers pull device data on their own instead of filing internal requests
                          </li>
@@ -469,7 +469,7 @@ export default function ComputerSciencePage() {
                       </div>
                    </div>
                    <div>
-                      <ul className="list-disc pl-5 text-gray-100 text-[15px] leading-6 space-y-2 marker:text-gray-100">
+                      <ul className="list-disc pl-5 text-gray-100 md:text-[15px] text-[13px] leading-6 space-y-2 marker:text-gray-100">
                          <li>
                             Built responsive React and TypeScript interfaces with modern state management and routing so the apps worked smoothly across desktop and mobile
                          </li>
@@ -490,8 +490,8 @@ export default function ComputerSciencePage() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                <div>
-                  <h4 className=" text-[10px]  tracking-widest mb-4">Backend & Infra</h4>
-                  <ul className="text-sm  space-y-2 font-mono">
+                  <h4 className=" text-[11px]  tracking-widest mb-4">Backend & Infra</h4>
+                  <ul className="md:text-sm text-[9pt]  space-y-2 font-mono">
                   <li>Java, Python, Node.js, C++</li>
                   <li>FastAPI, Package Manager, Spring Boot</li>
                   <li>PostgreSQL, MongoDB, Redis, Elasticsearch</li>
@@ -500,8 +500,8 @@ export default function ComputerSciencePage() {
                </div>
 
                <div>
-                  <h4 className=" text-[10px]  tracking-widest mb-4">Frontend & Design</h4>
-                  <ul className="text-sm  space-y-2 font-mono">
+                  <h4 className=" text-[11px]  tracking-widest mb-4">Frontend & Design</h4>
+                  <ul className="md:text-sm text-[9pt] space-y-2 font-mono">
                   <li>TypeScript, React, Next.js</li>
                   <li>Javascript, React Query, Redux Toolkit</li>
                   <li>Tailwind CSS, component systems, Storybook, Jest</li>
@@ -510,8 +510,8 @@ export default function ComputerSciencePage() {
                </div>
 
                <div>
-                  <h4 className=" text-[10px]  tracking-widest mb-4">LLM & Agent</h4>
-                  <ul className="text-sm  space-y-2 font-mono">
+                  <h4 className=" text-[11px]  tracking-widest mb-4">LLM & Agent</h4>
+                  <ul className="md:text-sm text-[9pt]  space-y-2 font-mono">
                   <li>PyTorch, HuggingFace, Transformers</li>
                   <li>LangChain, FAISS, RAG pipelines</li>
                   <li>LLM, Agent, API</li>
@@ -520,7 +520,7 @@ export default function ComputerSciencePage() {
                {/* 4. Infinite Scroll Icons (右下 - 图标滚动区) */}
                <div className="flex flex-col h-full">
                   
-                  <h4 className=" text-[10px]  tracking-widest mb-4">
+                  <h4 className=" text-[11px]  tracking-widest mb-4">
                      Languages
                   </h4>
 
