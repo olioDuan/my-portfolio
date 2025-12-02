@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+html {
+  scroll-behavior: smooth;
+}
+
+/* ========================================= */
+/* 👇 把这段代码贴在 app/globals.css 的最后一行 👇 */
+/* ========================================= */
+
+@keyframes infinite-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%); /* 让它向左跑 */
+  }
+}
+
+.animate-infinite-scroll {
+  /* 25s 是跑一圈的时间。想跑得快改成 10s，慢改成 40s */
+  animation: infinite-scroll 25s linear infinite;
+  /* 确保它不会停 */
+  display: flex; 
+  width: max-content; /* 强制内容撑开宽度 */
+}
